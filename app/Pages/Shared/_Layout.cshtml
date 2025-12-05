@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Expense Management</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a class="navbar-brand" href="/Index">💼 Expense Management</a>
+                <div class="nav-menu">
+                    <a class="nav-link" href="/Index">Dashboard</a>
+                    <a class="nav-link" href="/Expenses">Expenses</a>
+                    <a class="nav-link" href="/Users">Users</a>
+                    <a class="nav-link" href="/chat">💬 AI Chat</a>
+                    <a class="nav-link" href="/swagger">📖 API Docs</a>
+                </div>
+            </div>
+        </nav>
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <div class="error-banner">
+                <div class="container">
+                    <strong>⚠️ Connection Error:</strong> @ViewData["ErrorMessage"]
+                </div>
+            </div>
+        }
+    </header>
+    <div class="container main-content">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Expense Management System - Modernized with Azure</p>
+        </div>
+    </footer>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

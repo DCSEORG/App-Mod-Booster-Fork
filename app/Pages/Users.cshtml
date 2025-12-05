@@ -1,0 +1,55 @@
+@page
+@model UsersModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="users-page">
+    <h1>👥 User Management</h1>
+
+    <div class="expense-table" style="margin-top: 2rem;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Manager</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users)
+                {
+                    <tr>
+                        <td>@user.UserId</td>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td><span class="status-badge status-@user.RoleName.ToLower()">@user.RoleName</span></td>
+                        <td>@(user.ManagerName ?? "-")</td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <span class="status-badge status-approved">Active</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-rejected">Inactive</span>
+                            }
+                        </td>
+                        <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (!Model.Users.Any())
+    {
+        <div style="text-align: center; padding: 3rem; color: #718096;">
+            <p style="font-size: 1.2rem;">👥 No users found.</p>
+        </div>
+    }
+</div>

@@ -1,0 +1,77 @@
+@page
+@model ExpensesModel
+@{
+    ViewData["Title"] = "All Expenses";
+}
+
+<div class="expenses-page">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>💰 Expense List</h1>
+        <div>
+            <a href="/Expenses/Create" class="btn btn-success">➕ Create New Expense</a>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 1.5rem;">
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter" onchange="filterByStatus(this.value)" style="width: auto; display: inline-block; margin-left: 1rem;">
+            <option value="">All Statuses</option>
+            <option value="Draft">Draft</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
+
+    <div class="expense-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var expense in Model.Expenses)
+                {
+                    <tr>
+                        <td>@expense.ExpenseId</td>
+                        <td>@expense.UserName</td>
+                        <td>@expense.CategoryName</td>
+                        <td>£@expense.AmountGBP.ToString("F2")</td>
+                        <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
+                        <td><span class="status-badge status-@expense.StatusName.ToLower()">@expense.StatusName</span></td>
+                        <td>@(expense.Description ?? "-")</td>
+                        <td>
+                            <a href="/Expenses/Details?id=@expense.ExpenseId" class="btn-sm">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (!Model.Expenses.Any())
+    {
+        <div style="text-align: center; padding: 3rem; color: #718096;">
+            <p style="font-size: 1.2rem;">📋 No expenses found.</p>
+            <a href="/Expenses/Create" class="btn btn-primary" style="margin-top: 1rem;">Create your first expense</a>
+        </div>
+    }
+</div>
+
+<script>
+    function filterByStatus(status) {
+        if (status) {
+            window.location.href = `/Expenses?status=${status}`;
+        } else {
+            window.location.href = '/Expenses';
+        }
+    }
+</script>

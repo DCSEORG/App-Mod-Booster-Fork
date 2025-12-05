@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant - Expense Management</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .chat-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .chat-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .chat-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-page">
+        <div class="container">
+            <a href="/Index" class="back-link">← Back to Dashboard</a>
+            <div class="chat-header">
+                <h1>🤖 AI Chat Assistant</h1>
+                <p>Ask questions about your expenses and get instant answers!</p>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-box">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message message-ai">
+                            <div class="message-avatar">AI</div>
+                            <div class="message-content">
+                                Hello! I'm your AI expense assistant. I can help you:
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                    <li>View and filter expenses</li>
+                                    <li>Check pending approvals</li>
+                                    <li>Get expense summaries</li>
+                                    <li>Create and submit expenses</li>
+                                    <li>Answer questions about users and categories</li>
+                                </ul>
+                                How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="loading" id="loading">
+                        <p>🤔 Thinking...</p>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything about expenses..." />
+                        <button onclick="sendMessage()" class="chat-send-btn">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle Enter key in input
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                // Call the chat API
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to get response');
+                }
+                
+                const data = await response.json();
+                
+                // Add AI response to chat
+                addMessage(data.message, 'ai');
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message message-${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? 'You' : 'AI';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            // Format the message content
+            const formattedText = formatMessage(text);
+            content.innerHTML = formattedText;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function formatMessage(text) {
+            // Escape HTML to prevent XSS
+            let escaped = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+            
+            // Apply formatting after escaping
+            let formatted = escaped
+                // Bold text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                // Numbered lists
+                .replace(/(\d+\.\s.+?)(?=\n|$)/g, '<li>$1</li>')
+                // Bullet lists
+                .replace(/^[-*]\s(.+?)$/gm, '<li>$1</li>')
+                // Line breaks
+                .replace(/\n/g, '<br>');
+            
+            // Wrap lists in proper tags
+            formatted = formatted.replace(/(<li>.*?<\/li>)+/g, function(match) {
+                if (match.includes('1.')) {
+                    return '<ol>' + match.replace(/\d+\.\s/g, '') + '</ol>';
+                } else {
+                    return '<ul>' + match + '</ul>';
+                }
+            });
+            
+            return formatted;
+        }
+    </script>
+</body>
+</html>
