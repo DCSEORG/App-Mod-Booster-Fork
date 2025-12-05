@@ -176,8 +176,16 @@ public class ChatService
 
                 case "get_expenses_by_status":
                     var statusArgs = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(argumentsJson);
-                    var status = statusArgs!["status"].GetString();
-                    var expensesByStatus = await _databaseService.GetExpensesByStatusAsync(status!);
+                    if (statusArgs == null || !statusArgs.ContainsKey("status"))
+                    {
+                        return JsonSerializer.Serialize(new { error = "Missing required parameter: status" });
+                    }
+                    var status = statusArgs["status"].GetString();
+                    if (string.IsNullOrEmpty(status))
+                    {
+                        return JsonSerializer.Serialize(new { error = "Status parameter cannot be empty" });
+                    }
+                    var expensesByStatus = await _databaseService.GetExpensesByStatusAsync(status);
                     return JsonSerializer.Serialize(expensesByStatus);
 
                 case "get_all_users":
