@@ -1,0 +1,74 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="dashboard">
+    <h1>📊 Expense Dashboard</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">@Model.TotalExpenses</div>
+            <div class="stat-label">Total Expenses</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.PendingCount</div>
+            <div class="stat-label">Pending Approval</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">£@Model.TotalAmount</div>
+            <div class="stat-label">Total Amount</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.TotalUsers</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <h2>Quick Actions</h2>
+        <div class="button-grid">
+            <a href="/Expenses" class="btn btn-primary">📝 View All Expenses</a>
+            <a href="/Expenses/Create" class="btn btn-success">➕ Create New Expense</a>
+            <a href="/Expenses/Pending" class="btn btn-warning">⏳ Review Pending</a>
+            <a href="/Users" class="btn btn-info">👥 Manage Users</a>
+            <a href="/chat" class="btn btn-ai">🤖 Ask AI Assistant</a>
+        </div>
+    </div>
+
+    <div class="recent-section">
+        <h2>Recent Expenses</h2>
+        <div class="expense-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in Model.RecentExpenses)
+                    {
+                        <tr>
+                            <td>@expense.ExpenseId</td>
+                            <td>@expense.UserName</td>
+                            <td>@expense.CategoryName</td>
+                            <td>£@expense.AmountGBP.ToString("F2")</td>
+                            <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="status-badge status-@expense.StatusName.ToLower()">@expense.StatusName</span></td>
+                            <td>
+                                <a href="/Expenses/Details?id=@expense.ExpenseId" class="btn-sm">View</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
